@@ -38,7 +38,7 @@
                 <li><a href="index.html#about">О сервере</a></li>
                 <li><a href="index.html#lore">Лор</a></li>
                 <li><a href="rules.html" class="nav__link--active">Правила игры</a></li>
-                <li><a href="index.html#reviews">Отзывы</a></li>
+                <li><a href="reviews.html">Отзывы</a></li>
                 <li><a href="index.html#join">Как присоединиться</a></li>
                 <li class="nav__auth-wrap">
                     <button class="nav__auth-btn" id="navLoginBtn" type="button" onclick="window.doDiscordLogin()">Войти через Discord</button>
@@ -183,8 +183,8 @@
         if (typeof SUPABASE_CONFIG === 'undefined') { alert('config.js не загружен'); return; }
         if (!window.supabase) { alert('Supabase не загружен'); return; }
         var client = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-        var path = location.pathname.replace(/\/index\.html$/i, '').replace(/\/$/, '') || '/';
-        var redirectTo = location.origin + path + '#reviews';
+        var basePath = location.pathname.replace(/\/[^/]*$/, '') || '/';
+        var redirectTo = location.origin + (basePath === '/' ? '' : basePath) + '/reviews.html';
         client.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: redirectTo } })
           .then(function(r) { if (r.error) alert(r.error.message); else if (r.data && r.data.url) location.href = r.data.url; });
       };

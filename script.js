@@ -61,10 +61,11 @@ function initHeroVideo() {
 
 function initScrollReveal() {
     const elements = document.querySelectorAll('.scroll-reveal');
+    if (!elements.length) return;
     const observerOptions = {
         root: null,
-        rootMargin: '0px 0px -80px 0px', // Элемент появляется чуть раньше
-        threshold: 0.1
+        rootMargin: '50px 0px -50px 0px',
+        threshold: 0.01
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -76,7 +77,11 @@ function initScrollReveal() {
         });
     }, observerOptions);
 
-    elements.forEach(el => observer.observe(el));
+    elements.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight + 100) el.classList.add('revealed');
+        else observer.observe(el);
+    });
 }
 
 
@@ -171,17 +176,34 @@ function initReviews() {
     if (submitBtn) submitBtn.addEventListener('click', handleSubmitReview);
     if (reviewText && reviewChars) reviewText.addEventListener('input', () => { reviewChars.textContent = reviewText.value.length; });
 
-    supabase.auth.onAuthStateChange((event, session) => {
+    function applyAuthState(session) {
         if (hasReviewsSection) updateAuthUI(session);
         updateNavAuth(session);
         if (listEl) loadReviews();
+    }
+
+    supabase.auth.onAuthStateChange((event, session) => {
+        applyAuthState(session);
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-        if (hasReviewsSection) updateAuthUI(session);
-        updateNavAuth(session);
-        if (listEl) loadReviews();
-    });
+    async function initSession() {
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+        if (code) {
+            try {
+                const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+                if (!error) applyAuthState(data.session);
+            } catch (e) { /* ignore */ }
+            window.history.replaceState({}, '', window.location.pathname);
+            return;
+        }
+        const { data: { session } } = await supabase.auth.getSession();
+        applyAuthState(session);
+        if (!session && (window.location.hash?.includes('access_token') || window.location.hash?.includes('refresh_token'))) {
+            setTimeout(() => supabase.auth.getSession().then(({ data: { session: s } }) => applyAuthState(s)), 400);
+        }
+    }
+    initSession();
 }
 
 function openAuthModal() {
@@ -264,8 +286,8 @@ function escapeHtml(text) {
 async function handleDiscordLogin() {
     if (!supabase) return;
     try {
-        const path = location.pathname.replace(/\/index\.html$/i, '').replace(/\/$/, '') || '/';
-        const redirectUrl = location.origin + path + '#reviews';
+        const basePath = location.pathname.replace(/\/[^/]*$/, '') || '/';
+        const redirectUrl = location.origin + (basePath === '/' ? '' : basePath) + '/reviews.html';
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'discord',
             options: { redirectTo: redirectUrl }

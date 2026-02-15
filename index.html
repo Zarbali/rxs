@@ -38,7 +38,7 @@
                 <li><a href="#about">О сервере</a></li>
                 <li><a href="#lore">Лор</a></li>
                 <li><a href="rules.html">Правила игры</a></li>
-                <li><a href="#reviews">Отзывы</a></li>
+                <li><a href="reviews.html">Отзывы</a></li>
                 <li><a href="#join">Как присоединиться</a></li>
                 <li class="nav__auth-wrap">
                     <button class="nav__auth-btn" id="navLoginBtn" type="button" onclick="window.doDiscordLogin()">Войти через Discord</button>
@@ -169,24 +169,9 @@
                     <span class="section__tag">[ 04 ]</span>
                     <h2 class="section__title">Отзывы</h2>
                 </div>
-                <div class="reviews__auth scroll-reveal" id="reviewsAuth">
-                    <p class="reviews__hint">Отзывы видны всем. Чтобы оставить отзыв — войдите через Discord.</p>
-                    <button class="btn btn--secondary" id="reviewsLoginBtn" type="button" onclick="window.doDiscordLogin()">Войти</button>
-                </div>
-                <div class="reviews__form scroll-reveal" id="reviewsForm" style="display: none;">
-                    <div class="reviews__user" id="reviewsUser"></div>
-                    <div class="reviews__input-wrap">
-                        <textarea class="reviews__textarea" id="reviewText" placeholder="Напишите свой отзыв о сервере..." maxlength="500" rows="4"></textarea>
-                        <span class="reviews__chars"><span id="reviewChars">0</span>/500</span>
-                    </div>
-                    <div class="reviews__form-actions">
-                        <button class="btn btn--primary" id="submitReviewBtn">Отправить отзыв</button>
-                        <button class="btn btn--secondary" id="logoutBtn">Выйти</button>
-                    </div>
-                </div>
-                <div class="reviews__list" id="reviewsList"></div>
-                <div class="reviews__empty scroll-reveal" id="reviewsEmpty" style="display: none;">
-                    <p>Пока нет отзывов. Будьте первым!</p>
+                <p class="rules-preview scroll-reveal">Узнайте, что говорят игроки о сервере. Читайте отзывы и оставляйте свои после входа через Discord.</p>
+                <div class="rules-preview__btn scroll-reveal">
+                    <a href="reviews.html" class="btn btn--secondary">Перейти к отзывам</a>
                 </div>
             </div>
         </section>
@@ -229,8 +214,8 @@
         if (typeof SUPABASE_CONFIG === 'undefined') { alert('config.js не загружен'); return; }
         if (!window.supabase) { alert('Supabase не загружен'); return; }
         var client = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-        var path = location.pathname.replace(/\/index\.html$/i, '').replace(/\/$/, '') || '/';
-        var redirectTo = location.origin + path + '#reviews';
+        var basePath = location.pathname.replace(/\/[^/]*$/, '') || '/';
+        var redirectTo = location.origin + (basePath === '/' ? '' : basePath) + '/reviews.html';
         client.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: redirectTo } })
           .then(function(r) { if (r.error) alert(r.error.message); else if (r.data && r.data.url) location.href = r.data.url; });
       };
