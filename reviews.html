@@ -113,6 +113,6 @@
     };
     (function(){var h=(location.hash||'').replace(/^#/,'');if(h&&h.indexOf('access_token=')>=0&&h.indexOf('refresh_token=')>=0&&typeof SUPABASE_CONFIG!=='undefined'){try{var q=new URLSearchParams(h);var at=q.get('access_token'),rt=q.get('refresh_token');if(at&&rt){var c=window.supabase.createClient(SUPABASE_CONFIG.url,SUPABASE_CONFIG.anonKey);c.auth.setSession({access_token:at,refresh_token:rt}).then(function(){location.replace(location.pathname+location.search);});}}catch(e){}}})();
     </script>
-    <script src="script.js?v=7"></script>
+    <script src="script.js?v=8"></script>
 </body>
 </html>

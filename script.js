@@ -1,4 +1,4 @@
-let supabase = null;
+var supabase = null;
 
 window.doDiscordLogin = function() {
     if (typeof SUPABASE_CONFIG === 'undefined' || !SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) {
