@@ -373,7 +373,7 @@ ul {
     letter-spacing: 0.25em;
     color: var(--color-olive-light);
     margin-bottom: var(--space-md);
-    opacity: 0;
+    opacity: 1;
     animation: fadeUp 0.8s ease forwards;
 }
 
@@ -389,7 +389,7 @@ ul {
     letter-spacing: 0.15em;
     color: #fff;
     text-shadow: 0 0 40px rgba(139, 195, 74, 0.3);
-    opacity: 0;
+    opacity: 1;
     animation: fadeUp 0.8s ease 0.15s forwards;
 }
 
@@ -399,7 +399,7 @@ ul {
     height: 3px;
     background: linear-gradient(90deg, var(--color-olive), var(--color-accent));
     margin: var(--space-md) auto;
-    opacity: 0;
+    opacity: 1;
     animation: fadeUp 0.8s ease 0.3s forwards;
 }
 
@@ -410,7 +410,7 @@ ul {
     font-weight: 500;
     letter-spacing: 0.2em;
     color: var(--color-olive-light);
-    opacity: 0;
+    opacity: 1;
     animation: fadeUp 0.8s ease 0.4s forwards;
 }
 
@@ -421,7 +421,7 @@ ul {
     max-width: 560px;
     margin-left: auto;
     margin-right: auto;
-    opacity: 0;
+    opacity: 1;
     animation: fadeUp 0.8s ease 0.5s forwards;
 }
 
@@ -430,7 +430,7 @@ ul {
     flex-wrap: wrap;
     gap: var(--space-md);
     justify-content: center;
-    opacity: 0;
+    opacity: 1;
     animation: fadeUp 0.8s ease 0.65s forwards;
 }
 
@@ -657,11 +657,11 @@ ul {
     color: #fff;
 }
 
-/* Scroll reveal — base state */
+/* Scroll reveal — видимы по умолчанию, анимация при скролле */
 .scroll-reveal {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.6s ease, transform 0.6s ease;
 }
 
 .scroll-reveal.revealed {
@@ -672,13 +672,6 @@ ul {
 .scroll-reveal.delay-1 { transition-delay: 0.1s; }
 .scroll-reveal.delay-2 { transition-delay: 0.2s; }
 .scroll-reveal.delay-3 { transition-delay: 0.3s; }
-
-@media (prefers-reduced-motion: reduce) {
-    .scroll-reveal { opacity: 1; transform: none; transition: none; }
-    .hero__tag, .hero__title-main, .hero__title-divider, .hero__title-sub, .hero__desc, .hero__buttons {
-        opacity: 1; animation: none;
-    }
-}
 
 /* ============================================
    About Section

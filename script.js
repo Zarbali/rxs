@@ -61,13 +61,6 @@ function initHeroVideo() {
 
 function initScrollReveal() {
     const elements = document.querySelectorAll('.scroll-reveal');
-    if (!elements.length) return;
-    const observerOptions = {
-        root: null,
-        rootMargin: '50px 0px -50px 0px',
-        threshold: 0.01
-    };
-
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -75,13 +68,9 @@ function initScrollReveal() {
                 observer.unobserve(entry.target);
             }
         });
-    }, observerOptions);
+    }, { rootMargin: '0px 0px -50px 0px', threshold: 0.1 });
 
-    elements.forEach(el => {
-        const rect = el.getBoundingClientRect();
-        if (rect.top < window.innerHeight + 100) el.classList.add('revealed');
-        else observer.observe(el);
-    });
+    elements.forEach(el => observer.observe(el));
 }
 
 
@@ -160,7 +149,9 @@ function initReviews() {
     }
 
     try {
-        supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+        supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey, {
+            auth: { flowType: 'pkce', detectSessionInUrl: true }
+        });
     } catch (e) {
         if (authBlock) authBlock.innerHTML = '<p class="reviews__error">Ошибка инициализации. Проверьте config.js</p>';
         return;
@@ -187,20 +178,27 @@ function initReviews() {
     });
 
     async function initSession() {
-        const params = new URLSearchParams(window.location.search);
-        const code = params.get('code');
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
         if (code) {
             try {
                 const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-                if (!error) applyAuthState(data.session);
-            } catch (e) { /* ignore */ }
-            window.history.replaceState({}, '', window.location.pathname);
+                if (!error && data.session) {
+                    applyAuthState(data.session);
+                }
+            } catch (e) {
+                console.error('Ошибка обмена кода:', e);
+            }
+            window.history.replaceState({}, document.title, window.location.pathname);
             return;
         }
-        const { data: { session } } = await supabase.auth.getSession();
+        let { data: { session } } = await supabase.auth.getSession();
         applyAuthState(session);
-        if (!session && (window.location.hash?.includes('access_token') || window.location.hash?.includes('refresh_token'))) {
-            setTimeout(() => supabase.auth.getSession().then(({ data: { session: s } }) => applyAuthState(s)), 400);
+        if (!session && (window.location.hash || '').includes('access_token')) {
+            setTimeout(async () => {
+                const r = await supabase.auth.getSession();
+                if (r.data.session) applyAuthState(r.data.session);
+            }, 500);
         }
     }
     initSession();
@@ -257,6 +255,7 @@ function updateAuthUI(session) {
     const authBlock = document.getElementById('reviewsAuth');
     const formBlock = document.getElementById('reviewsForm');
     const userEl = document.getElementById('reviewsUser');
+    if (!authBlock || !formBlock) return;
 
     if (session?.user) {
         const meta = session.user.user_metadata;
