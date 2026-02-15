@@ -41,7 +41,7 @@
                 <li><a href="#reviews">Отзывы</a></li>
                 <li><a href="#join">Как присоединиться</a></li>
                 <li class="nav__auth-wrap">
-                    <button class="nav__auth-btn" id="navLoginBtn" type="button" onclick="(function(){ if(window.doDiscordLogin) { window.doDiscordLogin(); } else { alert('Скрипты не загрузились. Откройте сайт через http (не file://).'); } })()">Войти через Discord</button>
+                    <button class="nav__auth-btn" id="navLoginBtn" type="button" onclick="window.doDiscordLogin()">Войти через Discord</button>
                     <div class="nav__auth-user" id="navAuthUser" style="display: none;">
                         <img class="nav__auth-avatar" id="navAuthAvatar" src="" alt="">
                         <span class="nav__auth-name" id="navAuthName"></span>
@@ -171,7 +171,7 @@
                 </div>
                 <div class="reviews__auth scroll-reveal" id="reviewsAuth">
                     <p class="reviews__hint">Отзывы видны всем. Чтобы оставить отзыв — войдите через Discord.</p>
-                    <button class="btn btn--secondary" id="reviewsLoginBtn" type="button" onclick="(function(){ if(window.doDiscordLogin) { window.doDiscordLogin(); } else { alert('Скрипты не загрузились. Откройте сайт через http (не file://).'); } })()">Войти</button>
+                    <button class="btn btn--secondary" id="reviewsLoginBtn" type="button" onclick="window.doDiscordLogin()">Войти</button>
                 </div>
                 <div class="reviews__form scroll-reveal" id="reviewsForm" style="display: none;">
                     <div class="reviews__user" id="reviewsUser"></div>
@@ -224,6 +224,17 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
+    <script>
+      window.doDiscordLogin = function() {
+        if (typeof SUPABASE_CONFIG === 'undefined') { alert('config.js не загружен'); return; }
+        if (!window.supabase) { alert('Supabase не загружен'); return; }
+        var client = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+        var path = location.pathname.replace(/\/index\.html$/i, '').replace(/\/$/, '') || '/';
+        var redirectTo = location.origin + path + '#reviews';
+        client.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: redirectTo } })
+          .then(function(r) { if (r.error) alert(r.error.message); else if (r.data && r.data.url) location.href = r.data.url; });
+      };
+    </script>
     <script src="script.js"></script>
 </body>
 </html>

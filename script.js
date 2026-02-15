@@ -264,7 +264,8 @@ function escapeHtml(text) {
 async function handleDiscordLogin() {
     if (!supabase) return;
     try {
-        const redirectUrl = (location.origin + location.pathname).replace(/\/$/, '') + '/#reviews';
+        const path = location.pathname.replace(/\/index\.html$/i, '').replace(/\/$/, '') || '/';
+        const redirectUrl = location.origin + path + '#reviews';
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'discord',
             options: { redirectTo: redirectUrl }
