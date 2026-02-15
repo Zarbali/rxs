@@ -124,13 +124,7 @@ function initMobileMenu() {
 
 
 function initAuthModal() {
-    const doLogin = () => {
-        if (supabase) {
-            handleDiscordLogin();
-        } else {
-            alert('Настройте Supabase для входа. См. НАСТРОЙКА_ОТЗЫВОВ.md');
-        }
-    };
+    const doLogin = () => { if (typeof window.doDiscordLogin === 'function') window.doDiscordLogin(); else if (supabase) handleDiscordLogin(); };
     document.getElementById('reviewsLoginBtn')?.addEventListener('click', doLogin);
     document.getElementById('navLoginBtn')?.addEventListener('click', doLogin);
     document.getElementById('modalDiscordBtn')?.addEventListener('click', doLogin);
@@ -153,7 +147,6 @@ function initReviews() {
 
     if (!isConfigured) {
         if (authBlock) authBlock.innerHTML = '<p class="reviews__config-hint">Для работы отзывов настройте Supabase. См. НАСТРОЙКА_ОТЗЫВОВ.md</p>';
-        document.querySelector('.nav__auth-wrap')?.style.setProperty('display', 'none');
         return;
     }
 
