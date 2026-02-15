@@ -9,8 +9,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function initHeroVideo() {
     const video = document.querySelector('.hero__video');
+    const soundBtn = document.getElementById('heroSoundBtn');
+    const volumeSlider = document.getElementById('heroVolumeSlider');
     if (video) {
         video.muted = true;
+        video.volume = 0.8;
         video.playsInline = true;
         video.setAttribute('playsinline', '');
         video.setAttribute('webkit-playsinline', '');
@@ -18,6 +21,29 @@ function initHeroVideo() {
         if (playPromise !== undefined) {
             playPromise.catch(() => {}).then(() => {});
         }
+    }
+    if (video && soundBtn) {
+        soundBtn.addEventListener('click', () => {
+            video.muted = !video.muted;
+            soundBtn.classList.toggle('hero__sound-btn--muted', video.muted);
+            soundBtn.setAttribute('aria-label', video.muted ? 'Включить звук' : 'Выключить звук');
+        });
+        soundBtn.classList.add('hero__sound-btn--muted');
+    }
+    if (video && volumeSlider) {
+        volumeSlider.addEventListener('input', () => {
+            const vol = volumeSlider.value / 100;
+            video.volume = vol;
+            if (vol > 0) {
+                video.muted = false;
+                soundBtn.classList.remove('hero__sound-btn--muted');
+                soundBtn.setAttribute('aria-label', 'Выключить звук');
+            } else {
+                video.muted = true;
+                soundBtn.classList.add('hero__sound-btn--muted');
+                soundBtn.setAttribute('aria-label', 'Включить звук');
+            }
+        });
     }
 }
 

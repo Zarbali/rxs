@@ -326,6 +326,104 @@ ul {
     animation: scrollPulse 2s ease-in-out infinite;
 }
 
+.hero__sound-control {
+    position: absolute;
+    bottom: var(--space-xl);
+    right: clamp(1.5rem, 5vw, 4rem);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hero__sound-btn {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(26, 27, 30, 0.8);
+    border: 1px solid rgba(75, 93, 58, 0.4);
+    border-radius: 50%;
+    color: var(--color-olive-light);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.hero__sound-btn:hover {
+    background: rgba(75, 93, 58, 0.3);
+    color: var(--color-accent);
+    border-color: var(--color-olive);
+}
+
+.hero__sound-icon {
+    width: 24px;
+    height: 24px;
+    position: absolute;
+}
+
+.hero__sound-icon--on {
+    display: none;
+}
+
+.hero__sound-icon--off {
+    display: block;
+}
+
+.hero__sound-btn--muted .hero__sound-icon--on {
+    display: none;
+}
+
+.hero__sound-btn--muted .hero__sound-icon--off {
+    display: block;
+}
+
+.hero__sound-btn:not(.hero__sound-btn--muted) .hero__sound-icon--on {
+    display: block;
+}
+
+.hero__sound-btn:not(.hero__sound-btn--muted) .hero__sound-icon--off {
+    display: none;
+}
+
+.hero__volume-slider {
+    width: 80px;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(75, 93, 58, 0.3);
+    border-radius: 3px;
+    outline: none;
+}
+
+.hero__volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--color-olive-light);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.hero__volume-slider::-webkit-slider-thumb:hover {
+    background: var(--color-accent);
+}
+
+.hero__volume-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: var(--color-olive-light);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+}
+
+.hero__volume-slider::-moz-range-thumb:hover {
+    background: var(--color-accent);
+}
+
 @keyframes fadeUp {
     from {
         opacity: 0;
