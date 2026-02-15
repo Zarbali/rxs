@@ -168,7 +168,7 @@ function initReviews() {
     const userEl = document.getElementById('reviewsUser');
     if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
 
-    if (submitBtn) submitBtn.addEventListener('click', handleSubmitReview);
+    if (submitBtn) submitBtn.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); handleSubmitReview(); });
     if (reviewText && reviewChars) reviewText.addEventListener('input', () => { reviewChars.textContent = reviewText.value.length; });
 
     function applyAuthState(session) {
@@ -313,6 +313,7 @@ async function handleDiscordLogin() {
 
 async function handleLogout() {
     if (!supabaseClient) return;
+    if (!confirm('Выйти из аккаунта?')) return;
     await supabaseClient.auth.signOut();
 }
 
