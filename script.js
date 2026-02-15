@@ -1,11 +1,13 @@
-var supabase = null;
+var supabaseClient = null;
 
 window.doDiscordLogin = function() {
     if (typeof SUPABASE_CONFIG === 'undefined' || !SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) {
         alert('Настройте config.js');
         return;
     }
-    var client = supabase || window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+    var lib = typeof supabase !== 'undefined' ? supabase : (typeof window !== 'undefined' && window.supabase);
+    if (!lib || !lib.createClient) { alert('Supabase не загружен. Обновите страницу.'); return; }
+    var client = supabaseClient || lib.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
     var basePath = location.pathname.replace(/\/[^/]*$/, '') || '/';
     var redirectTo = location.origin + (basePath === '/' ? '' : basePath) + '/reviews.html';
     client.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: redirectTo } })
@@ -124,13 +126,13 @@ function initMobileMenu() {
 
 
 function initAuthModal() {
-    const doLogin = () => { if (typeof window.doDiscordLogin === 'function') window.doDiscordLogin(); else if (supabase) handleDiscordLogin(); };
+    const doLogin = () => { if (typeof window.doDiscordLogin === 'function') window.doDiscordLogin(); else if (supabaseClient) handleDiscordLogin(); };
     document.getElementById('reviewsLoginBtn')?.addEventListener('click', doLogin);
     document.getElementById('navLoginBtn')?.addEventListener('click', doLogin);
     document.getElementById('modalDiscordBtn')?.addEventListener('click', doLogin);
     document.getElementById('authModalClose')?.addEventListener('click', closeAuthModal);
     document.getElementById('authModalBackdrop')?.addEventListener('click', closeAuthModal);
-    document.getElementById('navLogoutBtn')?.addEventListener('click', () => { if (supabase) handleLogout(); });
+    document.getElementById('navLogoutBtn')?.addEventListener('click', () => { if (supabaseClient) handleLogout(); });
 }
 
 function initReviews() {
@@ -151,7 +153,7 @@ function initReviews() {
     }
 
     try {
-        supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey, {
+        supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey, {
             auth: { detectSessionInUrl: true }
         });
     } catch (e) {
@@ -175,7 +177,7 @@ function initReviews() {
         if (listEl) loadReviews();
     }
 
-    supabase.auth.onAuthStateChange((event, session) => {
+    supabaseClient.auth.onAuthStateChange((event, session) => {
         applyAuthState(session);
     });
 
@@ -187,8 +189,8 @@ function initReviews() {
             const refresh_token = params.get('refresh_token');
             if (access_token && refresh_token) {
                 try {
-                    const { data, error } = await supabase.auth.setSession({ access_token, refresh_token });
-                    const session = (data && data.session) ? data.session : (await supabase.auth.getSession()).data.session;
+                    const { data, error } = await supabaseClient.auth.setSession({ access_token, refresh_token });
+                    const session = (data && data.session) ? data.session : (await supabaseClient.auth.getSession()).data.session;
                     if (session) applyAuthState(session);
                 } catch (e) {
                     console.error('Ошибка входа:', e);
@@ -201,13 +203,13 @@ function initReviews() {
         const code = urlParams.get('code');
         if (code) {
             try {
-                const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+                const { data, error } = await supabaseClient.auth.exchangeCodeForSession(code);
                 if (!error && data.session) applyAuthState(data.session);
             } catch (e) {}
             window.history.replaceState({}, document.title, window.location.pathname);
             return;
         }
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         applyAuthState(session);
     }
     initSession();
@@ -292,11 +294,11 @@ function escapeHtml(text) {
 }
 
 async function handleDiscordLogin() {
-    if (!supabase) return;
+    if (!supabaseClient) return;
     try {
         const basePath = location.pathname.replace(/\/[^/]*$/, '') || '/';
         const redirectUrl = location.origin + (basePath === '/' ? '' : basePath) + '/reviews.html';
-        const { data, error } = await supabase.auth.signInWithOAuth({
+        const { data, error } = await supabaseClient.auth.signInWithOAuth({
             provider: 'discord',
             options: { redirectTo: redirectUrl }
         });
@@ -310,12 +312,12 @@ async function handleDiscordLogin() {
 }
 
 async function handleLogout() {
-    if (!supabase) return;
-    await supabase.auth.signOut();
+    if (!supabaseClient) return;
+    await supabaseClient.auth.signOut();
 }
 
 async function handleSubmitReview() {
-    if (!supabase) return;
+    if (!supabaseClient) return;
     const textEl = document.getElementById('reviewText');
     const text = textEl?.value?.trim();
     if (!text || text.length < 10) {
@@ -323,11 +325,11 @@ async function handleSubmitReview() {
         return;
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) return;
 
     try {
-        const { error } = await supabase.from('reviews').insert({
+        const { error } = await supabaseClient.from('reviews').insert({
             user_id: user.id,
             user_name: user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.user_name || user.email || 'Аноним',
             user_avatar: user.user_metadata?.avatar_url || user.user_metadata?.picture || null,
@@ -345,10 +347,10 @@ async function handleSubmitReview() {
 async function loadReviews() {
     const listEl = document.getElementById('reviewsList');
     const emptyEl = document.getElementById('reviewsEmpty');
-    if (!listEl || !supabase) return;
+    if (!listEl || !supabaseClient) return;
 
     try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('reviews')
             .select('*')
             .order('created_at', { ascending: false });
