@@ -31,17 +31,15 @@
         <div class="play-modal__backdrop" id="playModalBackdrop"></div>
         <div class="play-modal__content">
             <h3 class="play-modal__title">Подключиться к серверу</h3>
-            <p class="play-modal__desc">1. Запустите Arma 3. 2. Скачайте пресет и загрузите его в лаунчер. 3. Подпишитесь на моды. 4. Запустите игру с пресетом.</p>
+            <p class="play-modal__desc">Скачайте пресет, загрузите его в Arma 3 Launcher (Моды → Preset → Import). Лаунчер подскажет, на какие моды подписаться, Steam скачает их.</p>
             <div class="play-modal__actions">
-                <a href="#" class="play-modal__btn play-modal__btn--primary" id="playModalLaunch" target="_blank" rel="noopener noreferrer">
+                <a href="steam://run/107410" class="play-modal__btn play-modal__btn--primary" id="playModalLaunch">
                     <span class="btn__icon">▶</span> Запустить Arma 3
                 </a>
-                <a href="#" class="play-modal__btn play-modal__btn--secondary" id="playModalInstall" target="_blank" rel="noopener noreferrer">Установить Arma 3</a>
-                <a href="#" class="play-modal__btn play-modal__btn--secondary" id="playModalPreset" target="_blank" rel="noopener noreferrer" style="display:none">Скачать пресет</a>
-            </div>
-            <div class="play-modal__mods" id="playModalMods" style="display:none">
-                <p class="play-modal__mods-title">Моды сервера</p>
-                <ul class="play-modal__mods-list" id="playModalModsList"></ul>
+                <a href="#" class="play-modal__btn play-modal__btn--secondary" id="playModalPreset" download>
+                    <span class="btn__icon">↓</span> Скачать пресет
+                </a>
+                <a href="https://store.steampowered.com/app/107410/Arma_3/" class="play-modal__btn play-modal__btn--secondary" id="playModalInstall" target="_blank" rel="noopener noreferrer">Купить Arma 3</a>
             </div>
             <button class="play-modal__close" id="playModalClose" aria-label="Закрыть">×</button>
         </div>
