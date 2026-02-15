@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Тест входа</title>
+</head>
+<body>
+    <h1>Тест кнопки входа</h1>
+    <p>Если эта страница открыта через <strong>file://</strong> — кнопка не будет работать.</p>
+    <p>Запустите локальный сервер: в папке проекта выполните <code>npx serve</code>, затем откройте <code>http://localhost:3000/test-login.html</code></p>
+    
+    <button type="button" onclick="alert('Кнопка работает! JavaScript загружен.'); testLogin();">
+        Тест: Войти через Discord
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script>
+        function testLogin() {
+            if (typeof SUPABASE_CONFIG === 'undefined') {
+                alert('Ошибка: config.js не загружен или SUPABASE_CONFIG не определён.');
+                return;
+            }
+            if (SUPABASE_CONFIG.url.includes('YOUR_PROJECT')) {
+                alert('Ошибка: Заполните config.js своими данными Supabase.');
+                return;
+            }
+            try {
+                const client = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+                client.auth.signInWithOAuth({ provider: 'discord' })
+                    .then(({ data, error }) => {
+                        if (error) {
+                            alert('Ошибка: ' + error.message);
+                        } else if (data && data.url) {
+                            window.location.href = data.url;
+                        } else {
+                            alert('Не получен URL для перехода. Проверьте настройки Discord и Supabase.');
+                        }
+                    });
+            } catch (e) {
+                alert('Ошибка: ' + e.message);
+            }
+        }
+    </script>
+</body>
+</html>
