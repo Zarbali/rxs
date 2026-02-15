@@ -1,14 +1,18 @@
 let supabase = null;
 
 window.doDiscordLogin = function() {
-    if (supabase) {
-        handleDiscordLogin();
-    } else {
-        alert('Supabase не настроен. Проверьте config.js и загрузку страницы.');
+    if (typeof SUPABASE_CONFIG === 'undefined' || !SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) {
+        alert('Настройте config.js');
+        return;
     }
+    var client = supabase || window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+    var basePath = location.pathname.replace(/\/[^/]*$/, '') || '/';
+    var redirectTo = location.origin + (basePath === '/' ? '' : basePath) + '/reviews.html';
+    client.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: redirectTo } })
+        .then(function(r) { if (r.error) alert(r.error.message); else if (r.data && r.data.url) location.href = r.data.url; });
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+function runInits() {
     try { initHeroVideo(); } catch (e) {}
     try { initScrollReveal(); } catch (e) {}
     try { initHeaderScroll(); } catch (e) {}
@@ -16,7 +20,12 @@ document.addEventListener('DOMContentLoaded', () => {
     try { initSmoothScroll(); } catch (e) {}
     try { initAuthModal(); } catch (e) {}
     try { initReviews(); } catch (e) {}
-});
+}
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runInits);
+} else {
+    runInits();
+}
 
 function initHeroVideo() {
     const video = document.querySelector('.hero__video');
