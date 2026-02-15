@@ -150,7 +150,7 @@ function initReviews() {
 
     try {
         supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey, {
-            auth: { flowType: 'pkce', detectSessionInUrl: true }
+            auth: { detectSessionInUrl: true }
         });
     } catch (e) {
         if (authBlock) authBlock.innerHTML = '<p class="reviews__error">Ошибка инициализации. Проверьте config.js</p>';
@@ -178,28 +178,35 @@ function initReviews() {
     });
 
     async function initSession() {
+        const hash = (window.location.hash || '').replace(/^#/, '');
+        if (hash) {
+            const params = new URLSearchParams(hash);
+            const access_token = params.get('access_token');
+            const refresh_token = params.get('refresh_token');
+            if (access_token && refresh_token) {
+                try {
+                    const { data, error } = await supabase.auth.setSession({ access_token, refresh_token });
+                    const session = (data && data.session) ? data.session : (await supabase.auth.getSession()).data.session;
+                    if (session) applyAuthState(session);
+                } catch (e) {
+                    console.error('Ошибка входа:', e);
+                }
+                window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+                return;
+            }
+        }
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
         if (code) {
             try {
                 const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-                if (!error && data.session) {
-                    applyAuthState(data.session);
-                }
-            } catch (e) {
-                console.error('Ошибка обмена кода:', e);
-            }
+                if (!error && data.session) applyAuthState(data.session);
+            } catch (e) {}
             window.history.replaceState({}, document.title, window.location.pathname);
             return;
         }
-        let { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         applyAuthState(session);
-        if (!session && (window.location.hash || '').includes('access_token')) {
-            setTimeout(async () => {
-                const r = await supabase.auth.getSession();
-                if (r.data.session) applyAuthState(r.data.session);
-            }, 500);
-        }
     }
     initSession();
 }

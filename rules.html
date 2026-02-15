@@ -178,17 +178,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script>
-      window.doDiscordLogin = function() {
-        if (typeof SUPABASE_CONFIG === 'undefined') { alert('config.js не загружен'); return; }
-        if (!window.supabase) { alert('Supabase не загружен'); return; }
-        var client = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-        var basePath = location.pathname.replace(/\/[^/]*$/, '') || '/';
-        var redirectTo = location.origin + (basePath === '/' ? '' : basePath) + '/reviews.html';
-        client.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: redirectTo } })
-          .then(function(r) { if (r.error) alert(r.error.message); else if (r.data && r.data.url) location.href = r.data.url; });
-      };
-    </script>
-    <script src="script.js"></script>
+    <script src="script.js?v=2"></script>
 </body>
 </html>
