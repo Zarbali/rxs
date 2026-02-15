@@ -27,6 +27,26 @@
         </div>
     </div>
 
+    <div class="play-modal" id="playModal" aria-hidden="true">
+        <div class="play-modal__backdrop" id="playModalBackdrop"></div>
+        <div class="play-modal__content">
+            <h3 class="play-modal__title">Подключиться к серверу</h3>
+            <p class="play-modal__desc">1. Запустите Arma 3. 2. Скачайте пресет и загрузите его в лаунчер. 3. Подпишитесь на моды. 4. Запустите игру с пресетом.</p>
+            <div class="play-modal__actions">
+                <a href="#" class="play-modal__btn play-modal__btn--primary" id="playModalLaunch" target="_blank" rel="noopener noreferrer">
+                    <span class="btn__icon">▶</span> Запустить Arma 3
+                </a>
+                <a href="#" class="play-modal__btn play-modal__btn--secondary" id="playModalInstall" target="_blank" rel="noopener noreferrer">Установить Arma 3</a>
+                <a href="#" class="play-modal__btn play-modal__btn--secondary" id="playModalPreset" target="_blank" rel="noopener noreferrer" style="display:none">Скачать пресет</a>
+            </div>
+            <div class="play-modal__mods" id="playModalMods" style="display:none">
+                <p class="play-modal__mods-title">Моды сервера</p>
+                <ul class="play-modal__mods-list" id="playModalModsList"></ul>
+            </div>
+            <button class="play-modal__close" id="playModalClose" aria-label="Закрыть">×</button>
+        </div>
+    </div>
+
     <header class="header">
         <nav class="nav">
             <a href="index.html" class="nav__logo">
@@ -77,7 +97,7 @@
                 </h1>
                 <p class="hero__desc">Погрузитесь в атмосферу реалистичного военного конфликта. Тактика, командная работа и непредсказуемость каждой миссии.</p>
                 <div class="hero__buttons">
-                    <a href="#" class="btn btn--primary">
+                    <a href="#" class="btn btn--primary" data-open-play-modal aria-label="Подключиться к серверу">
                         <span class="btn__icon">▶</span>
                         Играть
                     </a>
@@ -182,7 +202,7 @@
                     <h2 class="join__title">Присоединяйтесь к операции</h2>
                     <p class="join__desc">Подключитесь к серверу и начните свою историю в Operation: Whisper of Sand. Ожидайте инструкций по подключению.</p>
                     <div class="join__buttons">
-                        <a href="#" class="btn btn--primary btn--large">
+                        <a href="#" class="btn btn--primary btn--large" data-open-play-modal>
                             <span class="btn__icon">▶</span>
                             Играть
                         </a>

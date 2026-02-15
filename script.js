@@ -21,6 +21,7 @@ function runInits() {
     try { initMobileMenu(); } catch (e) {}
     try { initSmoothScroll(); } catch (e) {}
     try { initAuthModal(); } catch (e) {}
+    try { initPlayModal(); } catch (e) {}
     try { initReviews(); } catch (e) {}
 }
 if (document.readyState === 'loading') {
@@ -227,6 +228,59 @@ function closeAuthModal() {
     const modal = document.getElementById('authModal');
     if (modal) {
         modal.classList.remove('auth-modal--open');
+        modal.setAttribute('aria-hidden', 'true');
+    }
+}
+
+function initPlayModal() {
+    const cfg = typeof ARMA_CONFIG !== 'undefined' ? ARMA_CONFIG : {};
+    const launchEl = document.getElementById('playModalLaunch');
+    const installEl = document.getElementById('playModalInstall');
+    const presetEl = document.getElementById('playModalPreset');
+    const modsWrap = document.getElementById('playModalMods');
+    const modsList = document.getElementById('playModalModsList');
+
+    if (launchEl) {
+        launchEl.href = cfg.steamRun || 'steam://run/107410';
+    }
+    if (installEl) {
+        installEl.href = cfg.steamInstall || 'https://store.steampowered.com/app/107410/Arma_3/';
+    }
+    if (presetEl && cfg.presetUrl) {
+        presetEl.href = cfg.presetUrl;
+        presetEl.style.display = '';
+    }
+    if (modsWrap && modsList && cfg.mods && cfg.mods.length > 0) {
+        modsWrap.style.display = 'block';
+        modsList.innerHTML = cfg.mods.map(function (m) {
+            var url = typeof m === 'string' ? m : m.url;
+            var name = typeof m === 'string' ? 'Подписаться на мод' : (m.name || 'Подписаться на мод');
+            return '<li><a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(name) + '</a></li>';
+        }).join('');
+    }
+
+    document.querySelectorAll('[data-open-play-modal]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            openPlayModal();
+        });
+    });
+    document.getElementById('playModalClose')?.addEventListener('click', closePlayModal);
+    document.getElementById('playModalBackdrop')?.addEventListener('click', closePlayModal);
+}
+
+function openPlayModal() {
+    const modal = document.getElementById('playModal');
+    if (modal) {
+        modal.classList.add('play-modal--open');
+        modal.setAttribute('aria-hidden', 'false');
+    }
+}
+
+function closePlayModal() {
+    const modal = document.getElementById('playModal');
+    if (modal) {
+        modal.classList.remove('play-modal--open');
         modal.setAttribute('aria-hidden', 'true');
     }
 }
